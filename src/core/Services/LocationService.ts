@@ -35,6 +35,11 @@ export class LocationService{
                                 'Ensure GPS is enabled and location services are turned on.'
                             ));
                             break;
+                        case 3:
+                            reject(new Error(
+                               'The request to get user location timed out.'
+                            ));
+                            break;
                         default:
                             reject(error);
                     }
