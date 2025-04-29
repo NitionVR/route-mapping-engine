@@ -64,7 +64,7 @@ describe('LocationService', ()=>{
     // location-based functionality
 
     test("requestPermission should return GRANTED when permission  is granted", async () => {
-        let mockedPermission = mockPermissions('granted');
+        mockPermissions('granted');
 
         mockGeo.getCurrentPositionMock.mockImplementation((success)=>{
            success({
@@ -82,6 +82,16 @@ describe('LocationService', ()=>{
         });
         const result = await locationService.requestPermission();
         expect(result).toBe(PermissionStatus.GRANTED);
+    });
+
+    test('requestPermission should return DENIED when permissions API returns denied', async()=>{
+        mockPermissions('denied');
+
+        mockGeo.getCurrentPositionMock.mockImplementation((success, error)=>{
+            error({code: 1, message: 'User denied location permissions'})
+        });
+        const result = await locationService.requestPermission();
+        expect(result).toBe(PermissionStatus.DENIED);
     });
 
 });

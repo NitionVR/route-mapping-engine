@@ -26,7 +26,11 @@ export class LocationService{
                 },
                 (error) => {
                     switch(error.code){
-
+                        case 1:
+                            resolve(PermissionStatus.DENIED);
+                            break;
+                        default:
+                            reject(error);
                     }
                 }
             )

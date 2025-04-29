@@ -1,3 +1,4 @@
 export enum PermissionStatus{
-    GRANTED = 'granted'
+    GRANTED = 'granted',
+    DENIED = 'denied'
 }
