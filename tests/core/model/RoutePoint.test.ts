@@ -9,7 +9,7 @@ describe("RoutePoint", () =>{
     test("create a RoutePoint with default accuracy", () =>{
         const point = new RoutePoint(testPosition, testTimeStamp);
         expect(point.position).toEqual(testPosition);
-        expect(point.timeStamp).toEqual(testTimeStamp);
+        expect(point.timestamp).toEqual(testTimeStamp);
         expect(point.accuracy).toEqual(testAccuracy);
     });
 

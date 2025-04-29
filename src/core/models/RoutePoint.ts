@@ -20,7 +20,7 @@ export class RoutePoint{
         return this._position;
     }
 
-    get timeStamp(): Date{
+    get timestamp(): Date{
         return this._timestamp;
     }
 
