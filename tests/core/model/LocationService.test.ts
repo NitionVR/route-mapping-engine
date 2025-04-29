@@ -94,4 +94,12 @@ describe('LocationService', ()=>{
         expect(result).toBe(PermissionStatus.DENIED);
     });
 
+    test('requestPermission should return error when position is unavailable ', async()=>{
+        mockGeo.getCurrentPositionMock.mockImplementation((success, error)=>{
+            error({code: 2, message: 'Position unavailable'});
+        });
+        await expect(locationService.requestPermission()).rejects.toThrow('Location cannot be determined.' +
+            'Ensure GPS is enabled and location services are turned on.');
+    });
+
 });

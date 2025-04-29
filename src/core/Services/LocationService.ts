@@ -29,6 +29,12 @@ export class LocationService{
                         case 1:
                             resolve(PermissionStatus.DENIED);
                             break;
+                        case 2:
+                            reject(new Error(
+                                'Location cannot be determined.' +
+                                'Ensure GPS is enabled and location services are turned on.'
+                            ));
+                            break;
                         default:
                             reject(error);
                     }
@@ -36,4 +42,5 @@ export class LocationService{
             )
         });
     }
+
 }
