@@ -1,4 +1,4 @@
-import {LocationService} from "../../../src/core/Services/LocationService";
+import {LocationService} from "../../../src/core/services/LocationService";
 import {PermissionStatus} from "../../../src/core/models/PermissionStatus";
 import {RoutePoint} from "../../../src/core/models/RoutePoint";
 
@@ -167,7 +167,7 @@ describe('LocationService', ()=>{
         await expect(locationService.requestPermission()).rejects.toEqual(unknownError);
     });
 
-    test('requestPermission should return reject with error when time out', async()=>{
+    test('getCurrentLocation should return reject with error when time out', async()=>{
         mockGeo.getCurrentPositionMock.mockImplementation((success, error)=>{
             error({code: 3, message: 'Timeout'});
         });
@@ -176,6 +176,20 @@ describe('LocationService', ()=>{
     });
 
 
+    // As a user I want to be able to track position changes of my
+    // devices
 
+    test('startTrackingLocation should call watchPosition on GeoLocation API', ()=>{
+       locationService.startLocationTracking();
+
+       expect(mockGeo.watchPositionMock).toHaveBeenCalled();
+       expect(mockGeo.watchPositionMock).toHaveBeenCalledWith(
+           expect.any(Function),
+           expect.any(Function),
+           expect.objectContaining({
+               enableHighAccuracy: true
+           })
+       )
+    })
 
 });

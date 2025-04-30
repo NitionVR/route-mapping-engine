@@ -3,7 +3,8 @@ import {RoutePoint} from "../models/RoutePoint";
 import {LatLng} from "../models/LatLng";
 
 export class LocationService{
-
+    private locationListeners : ((location: RoutePoint) => void)[] = [];
+    private watchId : number|null = null;
 
     isAvailable(): boolean{
         return 'geolocation' in navigator &&
@@ -72,12 +73,31 @@ export class LocationService{
                             ));
                             break;
                         default:
-                            
+                            reject(error)
                     }
                 },
             );
         })
 
+    }
+
+    startLocationTracking(): void{
+
+        this.watchId = navigator.geolocation.watchPosition(
+            (position)=>{
+                const location = this.positionToRoutePoint(position);
+                for (const listener of this.locationListeners) {
+                    listener(location);
+                }
+            },
+            (error) =>{
+                console.error('Error watching location:', error);
+            },
+            {
+                enableHighAccuracy: true,
+            }
+
+        )
     }
 
     private positionToRoutePoint(position: GeolocationPosition) {
