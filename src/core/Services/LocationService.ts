@@ -61,8 +61,19 @@ export class LocationService{
                     resolve(routePoint);
             },
                 (error) =>{
-                    console.error('Error getting location:', error);
-                    reject(error);
+                    switch (error.code){
+                        case 4:
+                            console.error('Error getting location:', error);
+                            reject(error);
+                            break;
+                        case 3:
+                            reject(new Error(
+                                'The request to get user location timed out.'
+                            ));
+                            break;
+                        default:
+                            
+                    }
                 },
             );
         })
