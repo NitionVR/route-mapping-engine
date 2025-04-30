@@ -1,4 +1,6 @@
 import {PermissionStatus} from "../models/PermissionStatus";
+import {RoutePoint} from "../models/RoutePoint";
+import {LatLng} from "../models/LatLng";
 
 export class LocationService{
 
@@ -48,4 +50,31 @@ export class LocationService{
         });
     }
 
+    async getCurrentLocation(): Promise<RoutePoint | null> {
+        if (!this.isAvailable()){
+            throw new Error('Geolocation API is not available');
+        }
+
+        return new Promise((resolve, reject) =>{
+            navigator.geolocation.getCurrentPosition((position)=>{
+                    const routePoint = this.positionToRoutePoint(position);
+                    resolve(routePoint);
+            },
+
+            );
+        })
+
+    }
+
+    private positionToRoutePoint(position: GeolocationPosition) {
+        const latLng: LatLng = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+        }
+
+        let routePoint: RoutePoint;
+        routePoint = new RoutePoint(latLng, new Date(position.timestamp)
+            , {accuracy: position.coords.accuracy});
+        return routePoint;
+    }
 }

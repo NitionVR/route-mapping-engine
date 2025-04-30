@@ -1,5 +1,6 @@
 import {LocationService} from "../../../src/core/Services/LocationService";
 import {PermissionStatus} from "../../../src/core/models/PermissionStatus";
+import {RoutePoint} from "../../../src/core/models/RoutePoint";
 
 const mockGeoLocation = () =>{
     const getCurrentPositionMock = jest.fn();
@@ -35,6 +36,13 @@ const mockPermissions = (state = 'granted') =>{
     return permissionMock;
 };
 
+function disableLocation() {
+    Object.defineProperty(global.navigator, 'geolocation', {
+        value: undefined,
+        configurable: true,
+    })
+}
+
 describe('LocationService', ()=>{
 
     let locationService: LocationService;
@@ -52,11 +60,9 @@ describe('LocationService', ()=>{
         expect(locationService.isAvailable()).toBe(true);
     });
 
+
     test('isAvailable should return false when geolocation is not available', ()=>{
-        Object.defineProperty(global.navigator, 'geolocation',{
-            value: undefined,
-            configurable: true,
-        })
+        disableLocation();
         expect(locationService.isAvailable()).toBe(false);
     });
 
@@ -108,6 +114,49 @@ describe('LocationService', ()=>{
         });
         await expect(locationService.requestPermission()).rejects.toThrow('The request to get user location ' +
             'timed out.');
+    });
+
+    test('requestPermission should return reject with original when unknown error when time out', async()=>{
+        const unknownError = new Error("Unknown error");
+        mockGeo.getCurrentPositionMock.mockImplementation((success, error)=>{
+            error(unknownError);
+        });
+        await expect(locationService.requestPermission()).rejects.toThrow(unknownError);
+    });
+
+
+    // As a user, I want to access my current location so that I can use
+    // location-based functionality
+
+    test('getCurrentLocation should return a RoutePoint when successful', async () => {
+        mockGeo.getCurrentPositionMock.mockImplementation((success) => {
+            success({
+                coords: {
+                    latitude: 37.7749,
+                    longitude: -122.4194,
+                    accuracy: 10,
+                    altitude: null,
+                    altitudeAccuracy: null,
+                    heading: null,
+                    speed: null
+                },
+                timestamp: 1672574400000
+            });
+        });
+
+        const result = await locationService.getCurrentLocation();
+
+        expect(result).toBeInstanceOf(RoutePoint);
+        expect(result?.position.latitude).toBe(37.7749);
+        expect(result?.position.longitude).toBe(-122.4194);
+        expect(result?.accuracy).toBe(10);
+        expect(result?.timestamp).toEqual(new Date(1672574400000));
+    });
+
+
+    test('getCurrentLocation should return an error when location is not available', async() =>{
+        disableLocation();
+        await expect(locationService.getCurrentLocation()).rejects.toThrow(Error('Geolocation API is not available'));
     });
 
 });
