@@ -60,7 +60,10 @@ export class LocationService{
                     const routePoint = this.positionToRoutePoint(position);
                     resolve(routePoint);
             },
-
+                (error) =>{
+                    console.error('Error getting location:', error);
+                    reject(error);
+                },
             );
         })
 

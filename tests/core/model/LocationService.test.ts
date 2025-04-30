@@ -159,4 +159,13 @@ describe('LocationService', ()=>{
         await expect(locationService.getCurrentLocation()).rejects.toThrow(Error('Geolocation API is not available'));
     });
 
+    test('getCurrentLocation should return reject with original error when unknown errors occurs', async()=>{
+
+        const unknownError = {code: 4, message: 'Unknown error'};
+        mockGeo.getCurrentPositionMock.mockImplementation((success, error)=>{
+            error(unknownError);
+        });
+        await expect(locationService.requestPermission()).rejects.toEqual(unknownError);
+    });
+
 });
